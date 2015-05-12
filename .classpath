@@ -7,5 +7,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/snowball"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/stanfordNLPCore"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/stanfordPOSTagger"/>
+	<classpathentry kind="lib" path="jars/seqClassif.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

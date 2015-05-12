@@ -1,5 +1,10 @@
 package hr.fer.zemris.apt.medical.preprocess;
 
+import hr.fer.zemris.apt.seqclassification.models.Document;
+import hr.fer.zemris.apt.seqclassification.models.DocumentBase;
+import hr.fer.zemris.apt.seqclassification.models.WeightedTermDocument;
+import hr.fer.zemris.apt.seqclassification.models.vsm.CUIDicitonary;
+
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -23,12 +28,13 @@ public class OutputFormater {
 
 	private englishStemmer stemmer;
 	private MaxentTagger tagger;
+	private DocumentBase<WeightedTermDocument> db;
 
 	public OutputFormater() {
 		stemmer = new englishStemmer();
 		tagger = new MaxentTagger(
 				"/usr/local/lib/my-java-libs/stanford-postagger-2015-04-20/models/english-left3words-distsim.tagger");
-
+		db = new CUIDicitonary("noStopWords.txt");
 	}
 
 	private String stem(String word) {
@@ -83,6 +89,26 @@ public class OutputFormater {
 		pw.println();
 	}
 
+	private void printLineBetter(PrintWriter pw, String word, int c, int start,
+			int end, String[] posTags, WordTagFinder wtf) {
+		String stem = stem(word);
+		printLine(pw, word, posTags[c], wtf.getLabel(start, end), stem,
+				wordShape(word), freq((db.termDocuments(stem).size())));
+	}
+
+	private String freq(int i) {
+//		if (i > 500) {
+//			return "H";
+//		}
+//		if (i > 100) {
+//			return "M";
+//		}
+//		if (i > 0)
+//			return "L";
+//		return "N";
+		return Integer.toString(i);
+	}
+
 	public void processText(String text, WordTagFinder wtf, OutputStream os) {
 		PrintWriter pw = new PrintWriter(os);
 
@@ -128,9 +154,10 @@ public class OutputFormater {
 				if (wtf.isStartingPoint(start)) {
 					if (wtf.isEndingPoint(end)) {
 						String word = w.word();
-						printLine(pw, word, posTags[c],
-								wtf.getLabel(start, end), stem(word),
-								wordShape(word));
+						// printLine(pw, word, posTags[c],
+						// wtf.getLabel(start, end), stem(word),
+						// wordShape(word));
+						printLineBetter(pw, word, c, start, end, posTags, wtf);
 					} else {
 						ok = false;
 						list.add(w.word());
@@ -140,11 +167,9 @@ public class OutputFormater {
 					// TODO STEM TO LOWER CASE?
 					// pw.println(word + " ----- ");
 					// String tag = posTags[c];
-					printLine(pw, word, posTags[c], wtf.getLabel(start, end),
-							stem(word), wordShape(word));
-					if (sentenceDelimeiters.contains(word)) {
-						pw.println();
-					}
+					// printLine(pw, word, posTags[c], wtf.getLabel(start, end),
+					// stem(word), wordShape(word));
+					printLineBetter(pw, word, c, start, end, posTags, wtf);
 				}
 			} else {
 				end = w.endPosition();
@@ -160,14 +185,19 @@ public class OutputFormater {
 					size--;
 					label = label.charAt(0) + "I";
 					for (String word : list) {
-						printLine(pw, word, posTags[c - size + 1],
-								wtf.getLabel(start, end), stem(word),
-								wordShape(word));
+						// printLine(pw, word, posTags[c - size + 1],
+						// wtf.getLabel(start, end), stem(word),
+						// wordShape(word));
+						printLineBetter(pw, word, c - size + 1, start, end,
+								posTags, wtf);
 						size--;
 					}
 					list.clear();
 					ok = true;
 				}
+			}
+			if (sentenceDelimeiters.contains(w.word())) {
+				pw.println();
 			}
 			c++;
 			if (c > posTags.length) {

@@ -21,16 +21,14 @@ public class WordTagFinder implements Iterable<Point> {
 	private List<Point> sortedLabels;
 	private Set<Integer> startingPoints;
 	private Set<Integer> endingPoints;
-
+	
 	public WordTagFinder() {
 		super();
-		spanLabel = new HashMap<Point, String>();
-		startingPoints = new HashSet<>();
-		endingPoints = new HashSet<>();
 	}
 
 	private void storeLabels(String span, String text, boolean isDist,
 			boolean first) {
+		
 		String[] split = span.split("-");
 		int start = Integer.parseInt(split[0]);
 		int endSpan = Integer.parseInt(split[1]);
@@ -91,16 +89,9 @@ public class WordTagFinder implements Iterable<Point> {
 	}
 
 	public void preprocessText(String text, String pipe) throws IOException {
-		// File text = new File(textFile);
-		// File pipe = new File(pipeFile);
-		//
-		// BufferedReader br = new BufferedReader(new InputStreamReader(
-		// new BufferedInputStream(new FileInputStream(text))));
-		//
-		// char[] data = new char[(int) text.length()];
-		//
-		// br.read(data);
-		// br.close();
+		spanLabel = new HashMap<Point, String>();
+		startingPoints = new HashSet<>();
+		endingPoints = new HashSet<>();
 
 		String allText = text;
 

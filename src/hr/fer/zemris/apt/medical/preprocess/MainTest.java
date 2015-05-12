@@ -16,12 +16,12 @@ public class MainTest {
 
 		String[] list = dir.list((direc, name) -> name.endsWith(".text"));
 
-//		list = new String[]{"07780-347384.text"};//"25585-058370.text","00414-104513.text"};
-		
+//		list = new String[] { "24638-098945.text" };// "25585-058370.text","00414-104513.text"};
+
 		for (String fn : list) {
-			
-//			fn = "00414-104513.text";
-			
+
+			// fn = "00414-104513.text";
+
 			File textFile = new File(dir.getAbsolutePath() + "/" + fn);
 
 			byte[] textbytes = new byte[(int) textFile.length()];
@@ -32,21 +32,27 @@ public class MainTest {
 			fis.close();
 
 			String text = new String(textbytes);
-			
-//			System.out.println(textFile.getName());
-//			System.out.println(text);
-//			System.exit(-1);
-			
+
+			// System.out.println(textFile.getName());
+			// System.out.println(text);
+			// System.exit(-1);
+
 			wtf.preprocessText(text,
 					dir.getAbsolutePath() + "/" + fn.split("\\.")[0] + ".pipe");
 
+//			int c =0;
 //			for (Point p : wtf) {
-//				System.out.println(p + ": " + wtf.getLabel(p.x, p.y));
+//				if (wtf.getLabel(p.x, p.y).equals("OB")){
+//					System.out.println(p + ": " + wtf.getLabel(p.x, p.y));
+//					c++;
+//				}
 //			}
+//			System.out.println(c);
 //			System.exit(-1);
-			
+
 			of.processText(text, wtf, System.out);
-//			System.exit(-1);
+			System.out.println();
+			// System.exit(-1);
 		}
 
 	}
