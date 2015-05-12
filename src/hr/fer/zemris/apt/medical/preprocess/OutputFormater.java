@@ -45,20 +45,31 @@ public class OutputFormater {
 
 		StringBuilder sb = new StringBuilder();
 
+		int last = -1;
+
 		while (it.hasNext()) {
 			int next = it.next();
+			int current = -1;
 			if (Character.isAlphabetic(next)) {
 				if (Character.isUpperCase(next)) {
-					sb.append('C');
+					current = 'C';
+					// sb.append('C');
 				} else {
-					sb.append('c');
+					current = 'c';
+					// sb.append('c');
 				}
 			} else {
 				if (Character.isDigit(next)) {
-					sb.append('n');
+					current = 'd';
+					// sb.append('n');
 				} else {
-					sb.append((char) next);
+					current = 'o';
+					// sb.append((char) next);
 				}
+			}
+			if (current != last) {
+				sb.append((char) current);
+				last = current;
 			}
 		}
 
@@ -83,12 +94,6 @@ public class OutputFormater {
 		Set<String> sentenceDelimeiters = new HashSet<>(
 				Arrays.asList(DocumentPreprocessor.DEFAULT_SENTENCE_DELIMS));
 
-		String[] posTags = tagger.tagString(text).split(" ");
-
-		for (int i = 0; i < posTags.length; i++) {
-			posTags[i] = posTags[i].split("_")[1];
-		}
-
 		int start = 0;
 		int end = 0;
 		boolean ok = true;
@@ -96,18 +101,45 @@ public class OutputFormater {
 
 		List<String> list = new ArrayList<>(5);
 
-		for (Word w : ptb.tokenize()) {
+		List<Word> tokens = ptb.tokenize();
 
+		StringBuilder sb = new StringBuilder();
+
+		for (Word token : tokens) {
+			sb.append(token.word()).append(' ');
+		}
+
+		String[] posTagsFull = tagger.tagTokenizedString(sb.toString()).split(
+				" ");
+
+		String[] posTags = new String[posTagsFull.length];
+
+		for (int i = 0; i < posTags.length; i++) {
+			posTags[i] = posTagsFull[i].split("_")[1];
+		}
+
+		Iterator<Word> it = tokens.iterator();
+
+		while (it.hasNext()) {
+			Word w = it.next();
 			if (ok) {
 				start = w.beginPosition();
 				end = w.endPosition();
 				if (wtf.isStartingPoint(start)) {
-					ok = false;
-					list.add(w.word());
+					if (wtf.isEndingPoint(end)) {
+						String word = w.word();
+						printLine(pw, word, posTags[c],
+								wtf.getLabel(start, end), stem(word),
+								wordShape(word));
+					} else {
+						ok = false;
+						list.add(w.word());
+					}
 				} else {
 					String word = w.word();
 					// TODO STEM TO LOWER CASE?
-					// System.out.println(word + " ----- ");
+					// pw.println(word + " ----- ");
+					// String tag = posTags[c];
 					printLine(pw, word, posTags[c], wtf.getLabel(start, end),
 							stem(word), wordShape(word));
 					if (sentenceDelimeiters.contains(word)) {
@@ -138,11 +170,13 @@ public class OutputFormater {
 				}
 			}
 			c++;
+			if (c > posTags.length) {
+				System.err.println(c + " " + posTags.length + " "
+						+ it.hasNext());
+				System.err.println("Not the same");
+				System.exit(-1);
+			}
 		}
-		pw.close();
-	}
-
-	public static void main(String[] args) {
-		System.out.println(new OutputFormater().wordShape("AbCd.*'"));
+		pw.flush();
 	}
 }

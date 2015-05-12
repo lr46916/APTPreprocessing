@@ -72,23 +72,22 @@ public class WordTagFinder implements Iterable<Point> {
 			}
 
 			while (end < endSpan
-					&& (text.charAt(end + 1) == ' ' || text.charAt(end + 1) == '\n')) {
-				System.out.println("???");
+					&& Character.isWhitespace(text.charAt(end))) {
 				end++;
 			}
-			start = end + 1;
+			start = end;
 		}
 
-		if (end != endSpan && text.length() > end) {
-			System.err.println("Fatal Error!!");
-			System.err.println(span);
-
-			System.err.println(spanLabel);
-
-			// System.err.println(text.substring(start, end));
-			System.err.println(text);
-			System.exit(-1);
-		}
+		// if (end != endSpan - 1 && text.length() > end) {
+		// System.err.println("Fatal Error!!");
+		// System.err.println(span);
+		//
+		// System.err.println(spanLabel);
+		//
+		// // System.err.println(text.substring(start, end));
+		// System.err.println(text);
+		// System.exit(-1);
+		// }
 	}
 
 	public void preprocessText(String text, String pipe) throws IOException {
@@ -105,9 +104,6 @@ public class WordTagFinder implements Iterable<Point> {
 
 		String allText = text;
 
-		System.out.println(allText.charAt(177) == '\n');
-		System.exit(-1);
-
 		BufferedReader br = new BufferedReader(new InputStreamReader(
 				new BufferedInputStream(new FileInputStream(pipe))));
 
@@ -121,6 +117,7 @@ public class WordTagFinder implements Iterable<Point> {
 			String[] split = line.split("\\|");
 
 			String span = split[1];
+			// System.out.println(span);
 			// TODO ??? provjerit sta ti je tocno bilo dok si ovo pisao
 			if (valueSet.contains(span)) {
 				continue;
@@ -136,6 +133,7 @@ public class WordTagFinder implements Iterable<Point> {
 					first = false;
 				}
 			} else {
+				// System.out.println(allText.substring(512, 526));
 				storeLabels(spans[0], allText, false, false);
 			}
 
@@ -160,6 +158,7 @@ public class WordTagFinder implements Iterable<Point> {
 	public String getLabel(int start, int end) {
 		p.x = start;
 		p.y = end;
+//		System.out.println("(" + start + "," + end + ")");
 		return spanLabel.getOrDefault(p, "O");
 	}
 

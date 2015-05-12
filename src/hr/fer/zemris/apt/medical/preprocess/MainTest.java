@@ -1,5 +1,6 @@
 package hr.fer.zemris.apt.medical.preprocess;
 
+import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,9 +16,13 @@ public class MainTest {
 
 		String[] list = dir.list((direc, name) -> name.endsWith(".text"));
 
+//		list = new String[]{"07780-347384.text"};//"25585-058370.text","00414-104513.text"};
+		
 		for (String fn : list) {
-
-			File textFile = new File(dir.getAbsolutePath() + "/" + "25585-058370.text");//dir.getAbsolutePath() + "/" + fn);
+			
+//			fn = "00414-104513.text";
+			
+			File textFile = new File(dir.getAbsolutePath() + "/" + fn);
 
 			byte[] textbytes = new byte[(int) textFile.length()];
 
@@ -35,11 +40,13 @@ public class MainTest {
 			wtf.preprocessText(text,
 					dir.getAbsolutePath() + "/" + fn.split("\\.")[0] + ".pipe");
 
-			// for(Point p : wtf){
-			// System.out.println(p + ": " + wtf.getLabel(p.x, p.y));
-			// }
-			System.out.println("ONE!" + "ASDASD");
+//			for (Point p : wtf) {
+//				System.out.println(p + ": " + wtf.getLabel(p.x, p.y));
+//			}
+//			System.exit(-1);
+			
 			of.processText(text, wtf, System.out);
+//			System.exit(-1);
 		}
 
 	}
