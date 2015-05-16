@@ -1,6 +1,5 @@
 package hr.fer.zemris.apt.medical.preprocess;
 
-import hr.fer.zemris.apt.seqclassification.models.Document;
 import hr.fer.zemris.apt.seqclassification.models.DocumentBase;
 import hr.fer.zemris.apt.seqclassification.models.WeightedTermDocument;
 import hr.fer.zemris.apt.seqclassification.models.vsm.CUIDicitonary;
