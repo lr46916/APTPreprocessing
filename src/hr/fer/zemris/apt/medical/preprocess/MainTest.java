@@ -16,7 +16,7 @@ public class MainTest {
 
 		String[] list = dir.list((direc, name) -> name.endsWith(".text"));
 
-//		list = new String[] { "24638-098945.text" };// "25585-058370.text","00414-104513.text"};
+//		list = new String[] { "07797-005646.text" };// "25585-058370.text","00414-104513.text"};
 
 		for (String fn : list) {
 
@@ -40,12 +40,13 @@ public class MainTest {
 			wtf.preprocessText(text,
 					dir.getAbsolutePath() + "/" + fn.split("\\.")[0] + ".pipe");
 
-//			int c =0;
+//			int c = 0;
 //			for (Point p : wtf) {
-//				if (wtf.getLabel(p.x, p.y).equals("OB")){
-//					System.out.println(p + ": " + wtf.getLabel(p.x, p.y));
+////				if (wtf.getLabel(p.x, p.y).equals("OB")) {
+//					System.out.println(p + ": " + wtf.getLabel(p.x, p.y)
+//							+ text.substring(p.x, p.y));
 //					c++;
-//				}
+////				}
 //			}
 //			System.out.println(c);
 //			System.exit(-1);

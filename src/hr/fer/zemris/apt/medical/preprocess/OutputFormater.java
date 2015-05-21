@@ -92,19 +92,20 @@ public class OutputFormater {
 			int end, String[] posTags, WordTagFinder wtf) {
 		String stem = stem(word);
 		printLine(pw, word, posTags[c], wtf.getLabel(start, end), stem,
-				wordShape(word), freq((db.termDocuments(stem).size())));
+				wordShape(word), freq((db.termDocuments(stem).size())),
+				Integer.toString(start) + "-" + end);
 	}
 
 	private String freq(int i) {
-//		if (i > 500) {
-//			return "H";
-//		}
-//		if (i > 100) {
-//			return "M";
-//		}
-//		if (i > 0)
-//			return "L";
-//		return "N";
+		// if (i > 500) {
+		// return "H";
+		// }
+		// if (i > 100) {
+		// return "M";
+		// }
+		// if (i > 0)
+		// return "L";
+		// return "N";
 		return Integer.toString(i);
 	}
 
@@ -153,6 +154,10 @@ public class OutputFormater {
 				if (wtf.isStartingPoint(start)) {
 					if (wtf.isEndingPoint(end)) {
 						String word = w.word();
+						if (checkForSpecialCase(pw, word, c, start, end,
+								posTags, wtf)) {
+							continue;
+						}
 						// printLine(pw, word, posTags[c],
 						// wtf.getLabel(start, end), stem(word),
 						// wordShape(word));
@@ -208,4 +213,24 @@ public class OutputFormater {
 		}
 		pw.flush();
 	}
+
+	private boolean checkForSpecialCase(PrintWriter pw, String word, int c,
+			int start, int end, String[] posTags, WordTagFinder wtf) {
+		if (!wtf.getLabel(start, end).equals("O")) {
+			return false;
+		}
+
+		int len = word.length();
+
+		for (int i = 0; i < len; i++) {
+			String label = wtf.getLabel(start, start + i);
+			if (!label.equals("O")) {
+				printLineBetter(pw, word, c, start, start + i, posTags, wtf);
+				break;
+			}
+		}
+
+		return true;
+	}
+
 }

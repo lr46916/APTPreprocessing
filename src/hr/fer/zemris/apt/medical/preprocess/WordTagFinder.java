@@ -21,14 +21,14 @@ public class WordTagFinder implements Iterable<Point> {
 	private List<Point> sortedLabels;
 	private Set<Integer> startingPoints;
 	private Set<Integer> endingPoints;
-	
+
 	public WordTagFinder() {
 		super();
 	}
 
 	private void storeLabels(String span, String text, boolean isDist,
 			boolean first) {
-		
+
 		String[] split = span.split("-");
 		int start = Integer.parseInt(split[0]);
 		int endSpan = Integer.parseInt(split[1]);
@@ -37,8 +37,8 @@ public class WordTagFinder implements Iterable<Point> {
 		String[] spanTextWords = spanText.split("\\s+");
 
 		boolean firstDistSingle = first;
-		// TODO ako cemo ubacit i HB i HD labele dodat
-		// boolean firstDisMultiple = true;
+//		 TODO ako cemo ubacit i HB i HI labele dodat
+		boolean firstDisMultiple = true;
 		boolean firstNormal = true;
 		int end = 0;
 
@@ -67,10 +67,19 @@ public class WordTagFinder implements Iterable<Point> {
 						spanLabel.put(p, "OI");
 					}
 				}
-			}
+			} 
+//			else {
+//				if (firstDisMultiple) {
+//					spanLabel.put(p, "HB");
+//					firstDisMultiple = false;
+//					firstNormal = false;
+//					firstDistSingle = false;
+//				} else {
+//					spanLabel.put(p, "HI");
+//				}
+//			}
 
-			while (end < endSpan
-					&& Character.isWhitespace(text.charAt(end))) {
+			while (end < endSpan && Character.isWhitespace(text.charAt(end))) {
 				end++;
 			}
 			start = end;
@@ -149,7 +158,7 @@ public class WordTagFinder implements Iterable<Point> {
 	public String getLabel(int start, int end) {
 		p.x = start;
 		p.y = end;
-//		System.out.println("(" + start + "," + end + ")");
+		// System.out.println("(" + start + "," + end + ")");
 		return spanLabel.getOrDefault(p, "O");
 	}
 
