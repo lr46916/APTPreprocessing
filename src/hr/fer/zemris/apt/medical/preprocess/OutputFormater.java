@@ -1,9 +1,12 @@
 package hr.fer.zemris.apt.medical.preprocess;
 
 import hr.fer.zemris.apt.seqclassification.models.DocumentBase;
-import hr.fer.zemris.apt.seqclassification.models.WeightedTermDocument;
-import hr.fer.zemris.apt.seqclassification.models.vsm.CUIDicitonary;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -27,13 +30,14 @@ public class OutputFormater {
 
 	private englishStemmer stemmer;
 	private MaxentTagger tagger;
-	private DocumentBase<WeightedTermDocument> db;
+	private DocumentBase db;
 
-	public OutputFormater() {
+	public OutputFormater(DocumentBase db) {
 		stemmer = new englishStemmer();
 		tagger = new MaxentTagger(
 				"/usr/local/lib/my-java-libs/stanford-postagger-2015-04-20/models/english-left3words-distsim.tagger");
-		db = new CUIDicitonary("noStopWords.txt");
+		this.db = db;
+		// db = new CUIDicitonary("noStopWords.txt");
 	}
 
 	private String stem(String word) {
@@ -91,9 +95,19 @@ public class OutputFormater {
 	private void printLineBetter(PrintWriter pw, String word, int c, int start,
 			int end, String[] posTags, WordTagFinder wtf) {
 		String stem = stem(word);
-		printLine(pw, word, posTags[c], wtf.getLabel(start, end), stem,
-				wordShape(word), freq((db.termDocuments(stem).size())),
-				Integer.toString(start) + "-" + end);
+		String label = wtf.getLabel(start, end);
+		if (label.equals("DB")) {
+			disjointLabel = true;
+		} else {
+			if (label.equals("DI")) {
+				if (!disjointLabel) {
+					return;
+				}
+			}
+		}
+		printLine(pw, word, posTags[c], label, stem, wordShape(word),
+				freq((db.termDocuments(stem).size())), Integer.toString(start)
+						+ "-" + end);
 	}
 
 	private String freq(int i) {
@@ -108,6 +122,8 @@ public class OutputFormater {
 		// return "N";
 		return Integer.toString(i);
 	}
+
+	private boolean disjointLabel = false;
 
 	public void processText(String text, WordTagFinder wtf, OutputStream os) {
 		PrintWriter pw = new PrintWriter(os);
@@ -124,6 +140,7 @@ public class OutputFormater {
 		int end = 0;
 		boolean ok = true;
 		int c = 0;
+		disjointLabel = false;
 
 		List<String> list = new ArrayList<>(5);
 
@@ -202,6 +219,7 @@ public class OutputFormater {
 			}
 			if (sentenceDelimeiters.contains(w.word())) {
 				pw.println();
+				disjointLabel = false;
 			}
 			c++;
 			if (c > posTags.length) {
