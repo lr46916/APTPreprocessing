@@ -32,7 +32,7 @@ public class OutputFormater {
 	private MaxentTagger tagger;
 	private DocumentBase db;
 
-	public OutputFormater(DocumentBase db,MaxentTagger tagger) {
+	public OutputFormater(DocumentBase db, MaxentTagger tagger) {
 		stemmer = new englishStemmer();
 		this.tagger = tagger;
 		this.db = db;
@@ -108,9 +108,10 @@ public class OutputFormater {
 				freq((db.termDocuments(stem).size())), Integer.toString(start)
 						+ "-" + end);
 	}
-	
-	private void printLineBetter2(PrintWriter pw, String word, int c, int start,
-			int end, String[] posTags, WordTagFinder wtf, String label) {
+
+	private void printLineBetter2(PrintWriter pw, String word, int c,
+			int start, int end, String[] posTags, WordTagFinder wtf,
+			String label) {
 		String stem = stem(word);
 		if (label.equals("DB")) {
 			disjointLabel = true;
@@ -146,8 +147,6 @@ public class OutputFormater {
 
 		Reader reader = new StringReader(text);
 
-		// String ls = System.getProperty("line.separator");
-
 		PTBTokenizer<Word> ptb = PTBTokenizer.newPTBTokenizer(reader);
 		Set<String> sentenceDelimeiters = new HashSet<>(
 				Arrays.asList(DocumentPreprocessor.DEFAULT_SENTENCE_DELIMS));
@@ -178,61 +177,43 @@ public class OutputFormater {
 		}
 
 		Iterator<Word> it = tokens.iterator();
-
 		while (it.hasNext()) {
 			Word w = it.next();
-			if (ok) {
-				start = w.beginPosition();
-				end = w.endPosition();
-				if (wtf.isStartingPoint(start)) {
-					if (wtf.isEndingPoint(end)) {
-						String word = w.word();
-						if (checkForSpecialCase(pw, word, c, start, end,
-								posTags, wtf)) {
-							continue;
-						}
-						// printLine(pw, word, posTags[c],
-						// wtf.getLabel(start, end), stem(word),
-						// wordShape(word));
-						printLineBetter(pw, word, c, start, end, posTags, wtf);
-					} else {
-						ok = false;
-						list.add(w.word());
+			start = w.beginPosition();
+			end = w.endPosition();
+			if (wtf.isStartingPoint(start)) {
+				if (wtf.isEndingPoint(end)) {
+					String word = w.word();
+					if (checkForSpecialCase(pw, word, c, start, end, posTags,
+							wtf)) {
+						continue;
 					}
+					// printLine(pw, word, posTags[c],
+					// wtf.getLabel(start, end), stem(word),
+					// wordShape(word));
+					printLineBetter(pw, word, c, start, end, posTags, wtf);
 				} else {
 					String word = w.word();
-//					 TODO STEM TO LOWER CASE?
-					// pw.println(word + " ----- ");
-					// String tag = posTags[c];
-					// printLine(pw, word, posTags[c], wtf.getLabel(start, end),
-					// stem(word), wordShape(word));
-					printLineBetter(pw, word, c, start, end, posTags, wtf);
+					if(wtf.isEndingPoint(end-1)){
+						if (checkForSpecialCase(pw, word, c, start, end, posTags,
+								wtf)) {
+							continue;
+						}
+						printLineBetter(pw, word, c, start, end, posTags, wtf);
+					} else {
+						printLineBetter(pw, word, c, start, end, posTags, wtf);
+					}
 				}
 			} else {
-				end = w.endPosition();
-				list.add(w.word());
-				int size = list.size();
-
-				if (wtf.isEndingPoint(end)) {
-					String firstWord = list.remove(0);
-					String label = wtf.getLabel(start, end);
-
-					printLineBetter(pw, firstWord, c - size + 1, start, end,
-							posTags, wtf);
-					size--;
-					label = label.charAt(0) + "I";
-					for (String word : list) {
-						// printLine(pw, word, posTags[c - size + 1],
-						// wtf.getLabel(start, end), stem(word),
-						// wordShape(word));
-						printLineBetter2(pw, word, c - size + 1, start, end,
-								posTags, wtf, label);
-						size--;
-					}
-					list.clear();
-					ok = true;
-				}
+				String word = w.word();
+				// TODO STEM TO LOWER CASE?
+				// pw.println(word + " ----- ");
+				// String tag = posTags[c];
+				// printLine(pw, word, posTags[c], wtf.getLabel(start, end),
+				// stem(word), wordShape(word));
+				printLineBetter(pw, word, c, start, end, posTags, wtf);
 			}
+
 			if (sentenceDelimeiters.contains(w.word())) {
 				pw.println();
 				disjointLabel = false;

@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +16,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import edu.stanford.nlp.ling.Word;
+import edu.stanford.nlp.process.PTBTokenizer;
 
 public class WordTagFinder implements Iterable<Point> {
 
@@ -34,19 +39,25 @@ public class WordTagFinder implements Iterable<Point> {
 		int endSpan = Integer.parseInt(split[1]);
 		String spanText = null;
 		spanText = text.substring(start, endSpan);
-		String[] spanTextWords = spanText.split("\\s+");
+
+		Reader reader = new StringReader(spanText);
+
+		PTBTokenizer<Word> ptb = PTBTokenizer.newPTBTokenizer(reader);
+
+		List<Word> tokens = ptb.tokenize();
+
+//		String[] spanTextWords = spanText.split("\\s+");
 
 		boolean firstDistSingle = first;
-//		 TODO ako cemo ubacit i HB i HI labele dodat
-		boolean firstDisMultiple = true;
+		// TODO ako cemo ubacit i HB i HI labele dodat
+//		boolean firstDisMultiple = true;
 		boolean firstNormal = true;
-		int end = 0;
+//		int end = 0;
 
-		for (String word : spanTextWords) {
-			int size = word.length();
-			end = start + size;
+		for (Word word : tokens) {
 
-			Point p = new Point(start, end);
+			Point p = new Point(start + word.beginPosition(), start
+					+ word.endPosition());
 
 			startingPoints.add(p.x);
 			endingPoints.add(p.y);
@@ -67,23 +78,61 @@ public class WordTagFinder implements Iterable<Point> {
 						spanLabel.put(p, "OI");
 					}
 				}
-			} 
-//			else {
-//				if (firstDisMultiple) {
-//					spanLabel.put(p, "HB");
-//					firstDisMultiple = false;
-//					firstNormal = false;
-//					firstDistSingle = false;
-//				} else {
-//					spanLabel.put(p, "HI");
-//				}
-//			}
-
-			while (end < endSpan && Character.isWhitespace(text.charAt(end))) {
-				end++;
 			}
-			start = end;
+			// else {
+			// if (firstDisMultiple) {
+			// spanLabel.put(p, "HB");
+			// firstDisMultiple = false;
+			// firstNormal = false;
+			// firstDistSingle = false;
+			// } else {
+			// spanLabel.put(p, "HI");
+			// }
+			// }
 		}
+
+		// for (String word : spanTextWords) {
+		// int size = word.length();
+		// end = start + size;
+		//
+		// Point p = new Point(start, end);
+		//
+		// startingPoints.add(p.x);
+		// endingPoints.add(p.y);
+		//
+		// if (!spanLabel.containsKey(p)) {
+		// if (isDist) {
+		// if (firstDistSingle) {
+		// spanLabel.put(p, "DB");
+		// firstDistSingle = false;
+		// } else {
+		// spanLabel.put(p, "DI");
+		// }
+		// } else {
+		// if (firstNormal) {
+		// spanLabel.put(p, "OB");
+		// firstNormal = false;
+		// } else {
+		// spanLabel.put(p, "OI");
+		// }
+		// }
+		// }
+		// // else {
+		// // if (firstDisMultiple) {
+		// // spanLabel.put(p, "HB");
+		// // firstDisMultiple = false;
+		// // firstNormal = false;
+		// // firstDistSingle = false;
+		// // } else {
+		// // spanLabel.put(p, "HI");
+		// // }
+		// // }
+		//
+		// while (end < endSpan && Character.isWhitespace(text.charAt(end))) {
+		// end++;
+		// }
+		// start = end;
+		// }
 
 		// if (end != endSpan - 1 && text.length() > end) {
 		// System.err.println("Fatal Error!!");

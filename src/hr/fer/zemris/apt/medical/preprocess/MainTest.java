@@ -22,11 +22,11 @@ public class MainTest {
 		DocumentBase db = (DocumentBase) ois.readObject();
 		ois.close();
 
-		WordTagFinder wtf = new WordTagFinder();
-
 		MaxentTagger tagger = new MaxentTagger(
 				"/usr/local/lib/my-java-libs/stanford-postagger-2015-04-20/models/english-left3words-distsim.tagger");
-		
+
+		WordTagFinder wtf = new WordTagFinder();
+
 		OutputFormater of = new OutputFormater(db, tagger);
 
 		File dir = new File(args[0]);
