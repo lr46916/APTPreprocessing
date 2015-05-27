@@ -5,21 +5,29 @@ import hr.fer.zemris.apt.seqclassification.models.DocumentBase;
 import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
 public class MainTest {
 
 	public static void main(String[] args) throws IOException,
 			ClassNotFoundException {
-		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File("dict")));
+		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(
+				new File("dict")));
 
 		DocumentBase db = (DocumentBase) ois.readObject();
 		ois.close();
 
 		WordTagFinder wtf = new WordTagFinder();
 
-		OutputFormater of = new OutputFormater(db);
+		MaxentTagger tagger = new MaxentTagger(
+				"/usr/local/lib/my-java-libs/stanford-postagger-2015-04-20/models/english-left3words-distsim.tagger");
+		
+		OutputFormater of = new OutputFormater(db, tagger);
 
 		File dir = new File(args[0]);
 		String[] list = null;

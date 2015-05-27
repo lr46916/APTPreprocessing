@@ -32,10 +32,9 @@ public class OutputFormater {
 	private MaxentTagger tagger;
 	private DocumentBase db;
 
-	public OutputFormater(DocumentBase db) {
+	public OutputFormater(DocumentBase db,MaxentTagger tagger) {
 		stemmer = new englishStemmer();
-		tagger = new MaxentTagger(
-				"/usr/local/lib/my-java-libs/stanford-postagger-2015-04-20/models/english-left3words-distsim.tagger");
+		this.tagger = tagger;
 		this.db = db;
 		// db = new CUIDicitonary("noStopWords.txt");
 	}
@@ -96,6 +95,23 @@ public class OutputFormater {
 			int end, String[] posTags, WordTagFinder wtf) {
 		String stem = stem(word);
 		String label = wtf.getLabel(start, end);
+		if (label.equals("DB")) {
+			disjointLabel = true;
+		} else {
+			if (label.equals("DI")) {
+				if (!disjointLabel) {
+					return;
+				}
+			}
+		}
+		printLine(pw, word, posTags[c], label, stem, wordShape(word),
+				freq((db.termDocuments(stem).size())), Integer.toString(start)
+						+ "-" + end);
+	}
+	
+	private void printLineBetter2(PrintWriter pw, String word, int c, int start,
+			int end, String[] posTags, WordTagFinder wtf, String label) {
+		String stem = stem(word);
 		if (label.equals("DB")) {
 			disjointLabel = true;
 		} else {
@@ -185,7 +201,7 @@ public class OutputFormater {
 					}
 				} else {
 					String word = w.word();
-					// TODO STEM TO LOWER CASE?
+//					 TODO STEM TO LOWER CASE?
 					// pw.println(word + " ----- ");
 					// String tag = posTags[c];
 					// printLine(pw, word, posTags[c], wtf.getLabel(start, end),
@@ -201,16 +217,16 @@ public class OutputFormater {
 					String firstWord = list.remove(0);
 					String label = wtf.getLabel(start, end);
 
-					printLine(pw, firstWord, posTags[c - size + 1], label,
-							stem(firstWord), wordShape(firstWord));
+					printLineBetter(pw, firstWord, c - size + 1, start, end,
+							posTags, wtf);
 					size--;
 					label = label.charAt(0) + "I";
 					for (String word : list) {
 						// printLine(pw, word, posTags[c - size + 1],
 						// wtf.getLabel(start, end), stem(word),
 						// wordShape(word));
-						printLineBetter(pw, word, c - size + 1, start, end,
-								posTags, wtf);
+						printLineBetter2(pw, word, c - size + 1, start, end,
+								posTags, wtf, label);
 						size--;
 					}
 					list.clear();
