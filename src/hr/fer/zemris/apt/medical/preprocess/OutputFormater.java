@@ -2,11 +2,6 @@ package hr.fer.zemris.apt.medical.preprocess;
 
 import hr.fer.zemris.apt.seqclassification.models.DocumentBase;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -194,9 +189,9 @@ public class OutputFormater {
 					printLineBetter(pw, word, c, start, end, posTags, wtf);
 				} else {
 					String word = w.word();
-					if(wtf.isEndingPoint(end-1)){
-						if (checkForSpecialCase(pw, word, c, start, end, posTags,
-								wtf)) {
+					if (wtf.isEndingPoint(end - 1)) {
+						if (checkForSpecialCase(pw, word, c, start, end,
+								posTags, wtf)) {
 							continue;
 						}
 						printLineBetter(pw, word, c, start, end, posTags, wtf);
@@ -215,8 +210,11 @@ public class OutputFormater {
 			}
 
 			if (sentenceDelimeiters.contains(w.word())) {
-				pw.println();
-				disjointLabel = false;
+				if (wtf.getLabel(w.beginPosition(), w.endPosition())
+						.equals("O")) {
+					pw.println();
+					disjointLabel = false;
+				}
 			}
 			c++;
 			if (c > posTags.length) {
@@ -234,7 +232,7 @@ public class OutputFormater {
 		if (!wtf.getLabel(start, end).equals("O")) {
 			return false;
 		}
-
+		
 		int len = word.length();
 
 		for (int i = 0; i < len; i++) {
