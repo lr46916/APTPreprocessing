@@ -99,6 +99,10 @@ public class OutputFormater {
 				}
 			}
 		}
+		if(label.equals("OI") && !(lastLabel.equals("OI") || lastLabel.equals("OB"))){
+			return;
+		}
+		lastLabel = label;
 		printLine(pw, word, posTags[c], label, stem, wordShape(word),
 				freq((db.termDocuments(stem).size())), Integer.toString(start)
 						+ "-" + end);
@@ -136,6 +140,7 @@ public class OutputFormater {
 	}
 
 	private boolean disjointLabel = false;
+	private String lastLabel = "";
 
 	public void processText(String text, WordTagFinder wtf, OutputStream os) {
 		PrintWriter pw = new PrintWriter(os);
@@ -201,11 +206,6 @@ public class OutputFormater {
 				}
 			} else {
 				String word = w.word();
-				// TODO STEM TO LOWER CASE?
-				// pw.println(word + " ----- ");
-				// String tag = posTags[c];
-				// printLine(pw, word, posTags[c], wtf.getLabel(start, end),
-				// stem(word), wordShape(word));
 				printLineBetter(pw, word, c, start, end, posTags, wtf);
 			}
 
@@ -214,6 +214,7 @@ public class OutputFormater {
 						.equals("O")) {
 					pw.println();
 					disjointLabel = false;
+					lastLabel = "";
 				}
 			}
 			c++;
