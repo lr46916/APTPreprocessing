@@ -26,11 +26,13 @@ public class OutputFormater {
 	private englishStemmer stemmer;
 	private MaxentTagger tagger;
 	private DocumentBase db;
+	private DocumentBase db2;
 
-	public OutputFormater(DocumentBase db, MaxentTagger tagger) {
+	public OutputFormater(DocumentBase db, MaxentTagger tagger, DocumentBase db2) {
 		stemmer = new englishStemmer();
 		this.tagger = tagger;
 		this.db = db;
+		this.db2 = db2;
 		// db = new CUIDicitonary("noStopWords.txt");
 	}
 
@@ -99,13 +101,33 @@ public class OutputFormater {
 				}
 			}
 		}
-		if(label.equals("OI") && !(lastLabel.equals("OI") || lastLabel.equals("OB"))){
+		if (label.equals("OI")
+				&& !(lastLabel.equals("OI") || lastLabel.equals("OB"))) {
 			return;
 		}
 		lastLabel = label;
-		printLine(pw, word, posTags[c], label, stem, wordShape(word),
-				freq((db.termDocuments(stem).size())), Integer.toString(start)
-						+ "-" + end);
+		String sufix;
+		String prefix;
+		if (word.length() >= 2) {
+			sufix = word.substring(word.length() - 2);
+			prefix = word.substring(0, 2).toLowerCase();
+		} else {
+			sufix = word;
+			prefix = word.toLowerCase();
+		}
+		if (db2 == null) {
+			printLine(pw, word, posTags[c], label, stem, wordShape(word),
+					freq((db.termDocuments(stem).size())),
+					Character.isUpperCase(word.charAt(0)) ? "1" : "0", sufix,
+					prefix, Integer.toString(start) + "-" + end);
+		} else {
+			printLine(pw, word, posTags[c], label, stem, wordShape(word),
+					freq((db.termDocuments(stem).size())),
+					Character.isUpperCase(word.charAt(0)) ? "1" : "0", sufix,
+					prefix, db2.termDocuments(stem).isEmpty() ? "0" : "1",
+					Integer.toString(start) + "-" + end);
+
+		}
 	}
 
 	private void printLineBetter2(PrintWriter pw, String word, int c,
@@ -233,7 +255,7 @@ public class OutputFormater {
 		if (!wtf.getLabel(start, end).equals("O")) {
 			return false;
 		}
-		
+
 		int len = word.length();
 
 		for (int i = 0; i < len; i++) {

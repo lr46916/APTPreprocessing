@@ -1,6 +1,7 @@
 package hr.fer.zemris.apt.medical.preprocess;
 
 import hr.fer.zemris.apt.seqclassification.models.DocumentBase;
+import hr.fer.zemris.apt.seqclassification.models.vsm.CUIDicitonary;
 
 import java.awt.Point;
 import java.io.File;
@@ -27,7 +28,8 @@ public class MainTest {
 
 		WordTagFinder wtf = new WordTagFinder();
 
-		OutputFormater of = new OutputFormater(db, tagger);
+		OutputFormater of = new OutputFormater(db, tagger, new CUIDicitonary(
+				"SNOMEDres.txt"));
 
 		File dir = new File(args[0]);
 		String[] list = null;
